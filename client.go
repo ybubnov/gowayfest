@@ -30,7 +30,7 @@ func main() {
 
 	for i := 0; i < num; i++ {
 		go func(no int) {
-			r := of.NewRequest(of.TypeHello, nil)
+			r := of.NewRequest(of.TypeEchoRequest, nil)
 			r.Header.Transaction = uint32(no)
 
 			mu.Lock()
@@ -47,8 +47,11 @@ func main() {
 
 	for i := 0; i < num; i++ {
 		r, err := c.Receive()
-		s := mm[r.Header.Transaction]
+		if err != nil {
+			panic(err)
+		}
 
+		s := mm[r.Header.Transaction]
 		fmt.Printf("%s %v\n", time.Since(s), err == nil)
 	}
 }
