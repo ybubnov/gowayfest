@@ -1,19 +1,25 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
+	"strconv"
 	"sync"
 	"time"
 
 	of "github.com/netrack/openflow"
 )
 
-const (
-	num = 100000
-)
-
 func main() {
+	flag.Parse()
+	args := flag.Args()
+
+	num, err := strconv.Atoi(args[0])
+	if err != nil {
+		log.Fatalf("failed to parse %s", args[0])
+	}
+
 	c, err := of.Dial("tcp", "localhost:6633")
 	if err != nil {
 		log.Fatalf("failed to dial localhost:6633, %s", err)
@@ -48,10 +54,11 @@ func main() {
 	for i := 0; i < num; i++ {
 		r, err := c.Receive()
 		if err != nil {
-			panic(err)
+			log.Println(err)
+			continue
 		}
 
 		s := mm[r.Header.Transaction]
-		fmt.Printf("%s %v\n", time.Since(s), err == nil)
+		fmt.Printf("%f\n", float64(time.Since(s).Seconds()))
 	}
 }

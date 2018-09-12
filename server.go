@@ -10,8 +10,9 @@ import (
 )
 
 func main() {
-	of.HandleFunc(of.TypeEchoRequest, func(rw of.ResponseWriter, r *of.Request) {
-		// time.Sleep(100 * time.Millisecond)
+	mux := of.NewTypeMux()
+	mux.HandleFunc(of.TypeEchoRequest, func(rw of.ResponseWriter, r *of.Request) {
+		time.Sleep(100 * time.Millisecond)
 
 		now := time.Now().Unix()
 		unix := strconv.Itoa(int(now))
@@ -24,5 +25,12 @@ func main() {
 	})
 
 	log.Printf("listening")
-	of.ListenAndServe(":6633", nil)
+	s := of.Server{
+		Addr:    ":6633",
+		Handler: mux,
+		//Runner:  of.SequentialRunner{},
+		Runner: of.NewMultiRoutineRunner(100),
+	}
+
+	s.ListenAndServe()
 }
