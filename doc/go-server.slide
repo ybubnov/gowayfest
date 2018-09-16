@@ -1,0 +1,80 @@
+Concurrent Server Architectures
+
+Yasha Bubnov
+Backend Engineer, Juno
+ybubnov@gojuno.com
+
+* Sequential Server
+
+- Create a server socket (listener).
+- Accept a client connection.
+- Handle requests.
+- Close the connection.
+
+
+* Concurrent Server
+
+- Create a server socket (listener).
+- Accept a client connection.
+- Spawn a goroutine.
+- Handle requests (concurrently?).
+- Close the connection.
+
+
+* Trivial Server
+
+Go networking is non-blocking, we can spawn any amount of Go-routines we want.
+.code src/1-server.go /^func main/,/^}/
+
+
+* Decomposition of Trivial Server
+
+Serve each incoming connection in a standalone goroutine.
+.code src/2-server.go /^func main/,/^}/
+
+
+* Handle requests concurrently
+
+.code src/2-server.go /^func serve/,/^}/
+
+Hanlde each incoming request from a single connection in a standalone goroutine.
+.code src/2-server.go /^func handle/,/^}/
+
+
+* Trivial Client
+
+.code src/3-client.go /^func main/,/^}/
+
+
+* Load Testing
+
+- One server with 256MiB memory.
+- One client connection with 10^6 requests.
+
+Spawn a container with a limited amount of memory and no swap:
+
+    docker run -m 256M --memory-swap 256M ...
+
+Eventually OOM kills it:
+
+    signal: killed
+
+
+* Worker Pool
+
+.code src/4-server.go /START POOL OMIT/,/END POOL OMIT/
+
+
+* Pre-goroutined Server
+
+.code src/4-server.go /^func main/,/^}/
+
+
+* Pre-goroutined Server
+.code src/4-server.go /^func serve/,/^}/
+
+
+* OpenFlow library:
+
+OpenFlow library:
+.link https://github.com/netrack/openflow github.com/netrack/openflow

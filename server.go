@@ -26,10 +26,10 @@ func main() {
 
 	log.Printf("listening")
 	s := of.Server{
-		Addr:    ":6633",
-		Handler: mux,
-		//Runner:  of.SequentialRunner{},
-		Runner: of.NewMultiRoutineRunner(100),
+		Addr:          ":6633",
+		Handler:       mux,
+		ConnRunner:    of.NewMultiRoutineRunner(3000),
+		HandlerRunner: of.NewMultiRoutineRunner(100),
 	}
 
 	s.ListenAndServe()
