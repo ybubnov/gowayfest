@@ -11,17 +11,15 @@ func main() {
 	for {
 		c, _ := ln.Accept() // HL
 
-		go func(c net.Conn) {
-			defer c.Close() // HL
-
-			for {
-				b := make([]byte, 256)
-				_, err := c.Read(b) // HL
-				if err != nil {
-					return
-				}
-				c.Write(b) // HL
+		for {
+			b := make([]byte, 256)
+			_, err := c.Read(b) // HL
+			if err != nil {
+				return
 			}
-		}(c)
+			c.Write(b) // HL
+		}
+
+		c.Close() // HL
 	}
 }

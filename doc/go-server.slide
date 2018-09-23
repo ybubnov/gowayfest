@@ -4,6 +4,13 @@ Yasha Bubnov
 Backend Engineer, Juno
 ybubnov@gojuno.com
 
+* Input Data
+
+- Transfer Control Protocol.
+- Clients with persisted connections.
+- Multiple requests from a single connection.
+
+
 * Sequential Server
 
 - Create a server socket (listener).
@@ -12,22 +19,66 @@ ybubnov@gojuno.com
 - Close the connection.
 
 
+* Sequential Server
+
+.code src/1-server.go /^func main/,/^}/
+
+
 * Concurrent Server
 
 - Create a server socket (listener).
 - Accept a client connection.
-- Spawn a goroutine.
-- Handle requests (concurrently?).
+- Handle requests concurrently.
 - Close the connection.
 
+* Forking & Threading
 
-* Trivial Server
+- Create a server socket.
+- Start accepting client connections.
+- Create a process/thread to handle each new client.
 
-Go networking is non-blocking, we can spawn any amount of Go-routines we want.
-.code src/1-server.go /^func main/,/^}/
+* Preforking & Prethreading
+
+- Create a server socket.
+- Spawn N processes.
+- Start accepting client connections.
 
 
-* Decomposition of Trivial Server
+* Preforking & Prethreading - Thundering Herd
+
+When an incoming TCP connection is accepted, all waiting processes / threads are awaken.
+
+
+* Preforking - Thundering Herd
+
+- Mutual exclusion through file locking.
+- Passing file descriptors from parent process to children processes.
+
+
+* Prethreading - Thundering Herd
+
+- Mutual exclusion though shared semaphore.
+
+
+* Preforking & Prethreading in Go
+
+If there is no solution to the problem then don't waste time worrying about it.
+
+    func ForkExec(argv0 string, argv []string, attr *ProcAttr) (pid int, err error)
+        Combination of fork and exec, careful to be thread safe.
+
+
+* C10K Problem
+
+It's time for web servers to handle ten thousand clients simultaneously, don't you think?
+Dan Kegel, 1999
+
+- Serve many clients with each thread, and use nonblocking I/O.
+- Serve many clients with each thread, and use asynchronous I/O.
+- Build the server code into the kernel (kttpd).
+
+
+* Concurrent Server in Go
 
 Serve each incoming connection in a standalone goroutine.
 .code src/2-server.go /^func main/,/^}/
@@ -37,7 +88,7 @@ Serve each incoming connection in a standalone goroutine.
 
 .code src/2-server.go /^func serve/,/^}/
 
-Hanlde each incoming request from a single connection in a standalone goroutine.
+Handle each incoming request from a single connection in a standalone goroutine.
 .code src/2-server.go /^func handle/,/^}/
 
 
@@ -46,9 +97,9 @@ Hanlde each incoming request from a single connection in a standalone goroutine.
 .code src/3-client.go /^func main/,/^}/
 
 
-* Load Testing
+* Testing
 
-- One server with 256MiB memory.
+- One server with 256 MiB memory.
 - One client connection with 10^6 requests.
 
 Spawn a container with a limited amount of memory and no swap:
@@ -60,21 +111,36 @@ Eventually OOM kills it:
     signal: killed
 
 
+* Why?
+
+- The minimum stack size in Go is 2 KiB:
+
+.code src/4-stack.go /START OMIT/,/END OMIT/
+
+- Math:
+
+    2KiB * 10^6 ~ 2TB
+
 * Worker Pool
 
-.code src/4-server.go /START POOL OMIT/,/END POOL OMIT/
+.code src/5-server.go /START POOL OMIT/,/END POOL OMIT/
 
 
 * Pre-goroutined Server
 
-.code src/4-server.go /^func main/,/^}/
+.code src/5-server.go /^func main/,/^}/
 
 
 * Pre-goroutined Server
-.code src/4-server.go /^func serve/,/^}/
+.code src/5-server.go /^func serve/,/^}/
 
 
-* OpenFlow library:
+* Painful Present
 
-OpenFlow library:
-.link https://github.com/netrack/openflow github.com/netrack/openflow
+- HTTP server from `"net/http"` does not _allow_ to setup handlers limit.
+- HTTP2 server from `"x/net/http2"` does not _implement_ handlers limit.
+
+
+* Conclusion
+
+Go is a _framework_ for writing high-performance servers, but use it wisely.
