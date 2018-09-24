@@ -29,7 +29,7 @@ func (p *pool) put(fn func()) {
 
 // END POOL OMIT
 
-func serve(p *pool, c net.Conn) { // HL
+func serve(c net.Conn) {
 	defer c.Close()
 
 	for {
@@ -39,9 +39,7 @@ func serve(p *pool, c net.Conn) { // HL
 			return
 		}
 
-		p.put(func() { // HL
-			handle(c, b) // HL
-		}) // HL
+		handle(c, b)
 	}
 }
 
@@ -57,6 +55,6 @@ func main() {
 
 	for {
 		c, _ := ln.Accept()
-		go serve(p, c) // HL
+		p.put(func() { serve(c) }) // HL
 	}
 }

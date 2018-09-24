@@ -15,7 +15,7 @@ func main() {
 			b := make([]byte, 256)
 			_, err := c.Read(b) // HL
 			if err != nil {
-				return
+				break
 			}
 			c.Write(b) // HL
 		}

@@ -4,11 +4,21 @@ Yasha Bubnov
 Backend Engineer, Juno
 ybubnov@gojuno.com
 
-* Input Data
+* Initial data
 
 - Transfer Control Protocol.
 - Clients with persisted connections.
 - Multiple requests from a single connection.
+
+
+* C10K Problem
+
+It's time for web servers to handle ten thousand clients simultaneously, don't you think?
+Dan Kegel, 1999
+
+- Serve many clients with each thread, and use nonblocking I/O.
+- Serve many clients with each thread, and use asynchronous I/O.
+- Build the server code into the kernel (khttpd).
 
 
 * Sequential Server
@@ -37,45 +47,35 @@ ybubnov@gojuno.com
 - Start accepting client connections.
 - Create a process/thread to handle each new client.
 
-* Preforking & Prethreading
+* Pre-forking & Pre-threading
 
 - Create a server socket.
 - Spawn N processes.
 - Start accepting client connections.
 
 
-* Preforking & Prethreading - Thundering Herd
+* Pre-forking & Pre-threading - Thundering Herd
 
 When an incoming TCP connection is accepted, all waiting processes / threads are awaken.
 
 
-* Preforking - Thundering Herd
+* Pre-forking - Thundering Herd
 
 - Mutual exclusion through file locking.
 - Passing file descriptors from parent process to children processes.
 
 
-* Prethreading - Thundering Herd
+* Pre-threading - Thundering Herd
 
 - Mutual exclusion though shared semaphore.
 
 
-* Preforking & Prethreading in Go
+* Pre-forking & Pre-threading in Go
 
 If there is no solution to the problem then don't waste time worrying about it.
 
     func ForkExec(argv0 string, argv []string, attr *ProcAttr) (pid int, err error)
         Combination of fork and exec, careful to be thread safe.
-
-
-* C10K Problem
-
-It's time for web servers to handle ten thousand clients simultaneously, don't you think?
-Dan Kegel, 1999
-
-- Serve many clients with each thread, and use nonblocking I/O.
-- Serve many clients with each thread, and use asynchronous I/O.
-- Build the server code into the kernel (kttpd).
 
 
 * Concurrent Server in Go
@@ -126,13 +126,15 @@ Eventually OOM kills it:
 .code src/5-server.go /START POOL OMIT/,/END POOL OMIT/
 
 
-* Pre-goroutined Server
+* Pre-goroutining Server
 
 .code src/5-server.go /^func main/,/^}/
 
 
-* Pre-goroutined Server
-.code src/5-server.go /^func serve/,/^}/
+* Handling Requests
+
+.code src/6-server.go /^func main/,/^}/
+.code src/6-server.go /^func serve/,/^}/
 
 
 * Painful Present
