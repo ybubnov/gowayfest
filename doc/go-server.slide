@@ -21,12 +21,17 @@ Dan Kegel, 1999
 - Build the server code into the kernel (khttpd).
 
 
+* How to Serve Many Clients
+
+
 * Sequential Server
 
 - Create a server socket (listener).
 - Accept a client connection.
 - Handle requests.
 - Close the connection.
+
+: Where is a link to Stevens book?
 
 
 * Sequential Server
@@ -47,11 +52,16 @@ Dan Kegel, 1999
 - Start accepting client connections.
 - Create a process/thread to handle each new client.
 
+: Where are the images of these?
+
+
 * Pre-forking & Pre-threading
 
 - Create a server socket.
 - Spawn N processes.
 - Start accepting client connections.
+
+: Examples of real-word applications?
 
 
 * Pre-forking & Pre-threading - Thundering Herd
@@ -68,6 +78,8 @@ When an incoming TCP connection is accepted, all waiting processes / threads are
 * Pre-threading - Thundering Herd
 
 - Mutual exclusion though shared semaphore.
+
+: Graphics?
 
 
 * Pre-forking & Pre-threading in Go
@@ -131,16 +143,34 @@ Eventually OOM kills it:
 .code src/5-server.go /^func main/,/^}/
 
 
-* Handling Requests
+* Handling Connections
 
 .code src/6-server.go /^func main/,/^}/
+
+
+* Handling Requests
+
 .code src/6-server.go /^func serve/,/^}/
 
 
-* Painful Present
+* Painful Reality
 
 - HTTP server from `"net/http"` does not _allow_ to setup handlers limit.
 - HTTP2 server from `"x/net/http2"` does not _implement_ handlers limit.
+
+
+* Non-blocking I/O vs. Asynchronous I/O.
+
+Correct questions:
+- Non-blocking vs. Blocking.
+- Asynchronous vs. Synchronous.
+
+    Blocking synchronous:       select, poll.
+    Non-blocking synchronous:   select, poll, epoll.
+    Non-blocking asynchronous:  aio_*.
+
+: Benchmarks??
+: Move this to the middle and explain each approach in details.
 
 
 * Conclusion
