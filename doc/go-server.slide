@@ -11,17 +11,16 @@ ybubnov@gojuno.com
 - Multiple requests from a single connection.
 
 
-* C10K Problem
+* The C10K Problem
 
 It's time for web servers to handle ten thousand clients simultaneously, don't you think?
 Dan Kegel, 1999
 
+.link http://www.kegel.com/c10k.html
+
 - Serve many clients with each thread, and use nonblocking I/O.
 - Serve many clients with each thread, and use asynchronous I/O.
 - Build the server code into the kernel (khttpd).
-
-
-* How to Serve Many Clients
 
 
 * Sequential Server
@@ -31,7 +30,7 @@ Dan Kegel, 1999
 - Handle requests.
 - Close the connection.
 
-.image img/1-pic.png 350 _
+.image img/1-pic.png 300 _
 
 : Where is a link to Stevens book?
 
@@ -42,7 +41,7 @@ Dan Kegel, 1999
 
 * Sequential Server
 
-.image img/2-pic.png 350 _
+.image img/2-pic.png 300 _
 
 
 * Concurrent Server
@@ -52,6 +51,8 @@ Dan Kegel, 1999
 - Handle requests concurrently.
 - Close the connection.
 
+.image img/9-pic.png 300 _
+
 
 * Forking
 
@@ -59,7 +60,7 @@ Dan Kegel, 1999
 - Start accepting client connections.
 - Create a process to handle each new client.
 
-.image img/3-pic.png 400 _
+.image img/3-pic.png 350 _
 
 
 * Threading
@@ -68,7 +69,7 @@ Dan Kegel, 1999
 - Start accepting client connections.
 - Create a thread to handle each new client.
 
-.image img/4-pic.png 400 _
+.image img/4-pic.png 350 _
 
 
 * Pre-forking & Pre-threading
@@ -77,7 +78,7 @@ Dan Kegel, 1999
 - Spawn N processes.
 - Start accepting client connections.
 
-.image img/5-pic.png 350 _
+.image img/5-pic.png 300 _
 : Examples of real-word applications?
 
 
@@ -85,7 +86,7 @@ Dan Kegel, 1999
 
 When an incoming TCP connection is accepted, all waiting processes / threads are awaken.
 
-.image img/6-pic.png 400 _
+.image img/6-pic.png 350 _
 
 
 * Pre-forking - Thundering Herd
@@ -93,14 +94,14 @@ When an incoming TCP connection is accepted, all waiting processes / threads are
 - Mutual exclusion through file locking.
 - Passing file descriptors from parent process to children processes.
 
-.image img/7-pic.png 350 _
+.image img/7-pic.png 300 _
 
 
 * Pre-threading - Thundering Herd
 
 - Mutual exclusion though shared semaphore.
 
-.image img/8-pic.png 500 _
+.image img/8-pic.png 400 _
 : Graphics?
 
 
@@ -111,6 +112,79 @@ If there is no solution to the problem then don't waste time worrying about it.
     func ForkExec(argv0 string, argv []string, attr *ProcAttr) (pid int, err error)
         Combination of fork and exec, careful to be thread safe.
 
+.image img/10-pic.png 250 _
+
+
+* User-Space Threading
+
+- Scheduled by the language runtime library.
+- Rely on the system threads.
+
+.image img/11-pic.png 350 _
+
+
+* Non-blocking I/O vs. Asynchronous I/O.
+
+Correct questions:
+- Non-blocking vs. Blocking.
+- Asynchronous vs. Synchronous.
+
+.image img/12-pic.png 300 _
+
+: Benchmarks??
+: Move this to the middle and explain each approach in details.
+
+
+* Blocking Synchronous I/O
+
+- Traditional `select`.
+- Traditional `poll`.
+
+.image img/13-pic.png 300 _
+
+
+* Non-blocking Synchronous I/O
+
+- Again `select`.
+- Again `poll`.
+- System call `epoll`.
+
+.image img/14-pic.png 250 _
+
+
+* Non-blocking Asynchronous I/O
+
+- Family of `aio_*` system calls.
+
+.image img/15-pic.png 250 _
+
+
+* Non-blocking Synchronous vs. Nonblocking Asynchronous I/O
+
+.link https://benchmarksgame-team.pages.debian.net/benchmarksgame/faster/go-node.html
+
+    source    secs    mem        cpu load
+    Go        15.36   148,056    88%
+    Node.js   62.94   1,858,960  70%
+
+
+.link https://hackernoon.com/aws-lambda-go-vs-node-js-performance-benchmark-1c8898341982
+    Max requests:        1000
+    Concurrency level:   5
+    Agent:               keepalive
+    Requests per second: 10
+                     Node.js    Go
+    Mean latency:    252.2 ms   109.7 ms
+     50%             203        91
+     90%             384        151
+     95%             478        197
+     99%             894        435
+    100%            8103       1133(longest request)
+
+
+* One Word About Parallelism in Go
+
+.image img/16-pic.png 400 _
 
 * Concurrent Server in Go
 
@@ -181,18 +255,6 @@ Eventually OOM kills it:
 - HTTP2 server from `"x/net/http2"` does not _implement_ handlers limit.
 
 
-* Non-blocking I/O vs. Asynchronous I/O.
-
-Correct questions:
-- Non-blocking vs. Blocking.
-- Asynchronous vs. Synchronous.
-
-    Blocking synchronous:       select, poll.
-    Non-blocking synchronous:   select, poll, epoll.
-    Non-blocking asynchronous:  aio_*.
-
-: Benchmarks??
-: Move this to the middle and explain each approach in details.
 
 
 * Conclusion
