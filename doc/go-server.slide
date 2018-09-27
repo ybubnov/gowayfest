@@ -4,11 +4,11 @@ Yasha Bubnov
 Backend Engineer, Juno
 ybubnov@gojuno.com
 
-* Initial data
-
-- Transfer Control Protocol.
-- Clients with persisted connections.
-- Multiple requests from a single connection.
+: * Initial data
+: 
+: - Transfer Control Protocol.
+: - Clients with persisted connections.
+: - Multiple requests from a single connection.
 
 
 * The C10K Problem
@@ -18,9 +18,9 @@ Dan Kegel, 1999
 
 .link http://www.kegel.com/c10k.html
 
+- Build the server code into the kernel (khttpd).
 - Serve many clients with each thread, and use nonblocking I/O.
 - Serve many clients with each thread, and use asynchronous I/O.
-- Build the server code into the kernel (khttpd).
 
 
 * Sequential Server
@@ -75,7 +75,7 @@ Dan Kegel, 1999
 * Pre-forking & Pre-threading
 
 - Create a server socket.
-- Spawn N processes.
+- Spawn N processes/threads.
 - Start accepting client connections.
 
 .image img/5-pic.png 300 _
@@ -92,7 +92,6 @@ When an incoming TCP connection is accepted, all waiting processes / threads are
 * Pre-forking - Thundering Herd
 
 - Mutual exclusion through file locking.
-- Passing file descriptors from parent process to children processes.
 
 .image img/7-pic.png 300 _
 
@@ -109,6 +108,8 @@ When an incoming TCP connection is accepted, all waiting processes / threads are
 
 If there is no solution to the problem then don't waste time worrying about it.
 
+    $ go doc syscall.ForkExec
+
     func ForkExec(argv0 string, argv []string, attr *ProcAttr) (pid int, err error)
         Combination of fork and exec, careful to be thread safe.
 
@@ -118,16 +119,17 @@ If there is no solution to the problem then don't waste time worrying about it.
 * User-Space Threading
 
 - Scheduled by the language runtime library.
-- Rely on the system threads.
+- Running within system threads.
 
 .image img/11-pic.png 350 _
 
 
 * Non-blocking I/O vs. Asynchronous I/O.
 
-Correct questions:
-- Non-blocking vs. Blocking.
-- Asynchronous vs. Synchronous.
+Combinations:
+- Blocking synchronous.
+- Non-blocking synchronous.
+- Non-blocking asynchronous.
 
 .image img/12-pic.png 300 _
 
@@ -159,19 +161,12 @@ Correct questions:
 .image img/15-pic.png 250 _
 
 
-* One Word About Parallelism in Go
+* Parallelism in Go
 
 .image img/16-pic.png 400 _
 
 
 * Non-blocking Synchronous vs. Nonblocking Asynchronous I/O
-
-.link https://benchmarksgame-team.pages.debian.net/benchmarksgame/faster/go-node.html
-
-    source    secs    mem        cpu load
-    Go        15.36   148,056    88%
-    Node.js   62.94   1,858,960  70%
-
 
 .link https://hackernoon.com/aws-lambda-go-vs-node-js-performance-benchmark-1c8898341982
     Max requests:        1000
@@ -255,4 +250,5 @@ Eventually OOM kills it:
 * Conclusion
 
 - Go uses non-blocking synchronous I/O multiplexing.
-- Go is a _framework_ for writing high-performance servers.
+- Go efficiently exploits CPU resources.
+- Go is a language for writing high-performance servers.

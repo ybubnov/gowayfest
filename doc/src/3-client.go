@@ -18,8 +18,8 @@ func main() {
 
 		go func(c net.Conn) {
 			out := make([]byte, 4)
-			c.Write("hello") // HL
-			c.Read(out)      // HL
+			c.Write([]byte("hello")) // HL
+			c.Read(out)              // HL
 			wg.Done()
 		}(c)
 	}
