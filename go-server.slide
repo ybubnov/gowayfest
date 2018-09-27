@@ -252,3 +252,8 @@ Eventually OOM kills it:
 - Go uses non-blocking synchronous I/O multiplexing.
 - Go efficiently exploits CPU resources.
 - Go is a language for writing high-performance servers.
+
+
+* Questions?
+
+.link https://github.com/ybubnov/gowayfest github.com/ybubnov/gowayfest
