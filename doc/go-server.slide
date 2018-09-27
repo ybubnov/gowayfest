@@ -58,7 +58,7 @@ Dan Kegel, 1999
 
 - Create a server socket.
 - Start accepting client connections.
-- Create a process to handle each new client.
+- Create a *process* to handle each new client.
 
 .image img/3-pic.png 350 _
 
@@ -67,7 +67,7 @@ Dan Kegel, 1999
 
 - Create a server socket.
 - Start accepting client connections.
-- Create a thread to handle each new client.
+- Create a *thread* to handle each new client.
 
 .image img/4-pic.png 350 _
 
@@ -159,6 +159,11 @@ Correct questions:
 .image img/15-pic.png 250 _
 
 
+* One Word About Parallelism in Go
+
+.image img/16-pic.png 400 _
+
+
 * Non-blocking Synchronous vs. Nonblocking Asynchronous I/O
 
 .link https://benchmarksgame-team.pages.debian.net/benchmarksgame/faster/go-node.html
@@ -181,10 +186,6 @@ Correct questions:
      99%             894        435
     100%            8103       1133(longest request)
 
-
-* One Word About Parallelism in Go
-
-.image img/16-pic.png 400 _
 
 * Concurrent Server in Go
 
@@ -236,11 +237,6 @@ Eventually OOM kills it:
 
 * Pre-goroutining Server
 
-.code src/5-server.go /^func main/,/^}/
-
-
-* Handling Connections
-
 .code src/6-server.go /^func main/,/^}/
 
 
@@ -256,7 +252,7 @@ Eventually OOM kills it:
 
 
 
-
 * Conclusion
 
-Go is a _framework_ for writing high-performance servers, but use it wisely.
+- Go uses non-blocking synchronous I/O multiplexing.
+- Go is a _framework_ for writing high-performance servers.

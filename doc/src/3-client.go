@@ -5,26 +5,27 @@ import (
 	"sync"
 )
 
-func main() {
-	const N = 1000000
-	var in = []byte("hello")
+const N = 1000000
 
+func main() {
 	var wg sync.WaitGroup
 	wg.Add(N)
 
-	c, _ := net.Dial("tcp", "localhost:3333") // HL
-
+	cc := make([]net.Conn, 0, N)
 	for i := 0; i < N; i++ {
-		go func() {
-			c.Write(in) // HL
+		c, _ := net.Dial("tcp", "localhost:3333") // HL
+		cc = append(cc, c)
+
+		go func(c net.Conn) {
+			out := make([]byte, 4)
+			c.Write("hello") // HL
+			c.Read(out)      // HL
 			wg.Done()
-		}()
+		}(c)
 	}
 
 	wg.Wait()
-	out := make([]byte, len(in))
-
 	for i := 0; i < N; i++ {
-		c.Read(out) // HL
+		cc[i].Close() // HL
 	}
 }

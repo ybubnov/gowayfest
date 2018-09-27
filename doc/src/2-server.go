@@ -15,7 +15,7 @@ func serve(c net.Conn) { // HL
 			return
 		}
 
-		handle(c, b) // HL
+		go handle(c, b) // HL
 	}
 }
 
